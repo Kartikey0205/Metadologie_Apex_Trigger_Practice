@@ -1,9 +1,11 @@
 public with sharing class ContactTriggerHelper {
     public static void beforeInsert(List<Contact> newList) {//NOPMD
         sendingEmail(newList, null);
+        preventDuplicateContact(newList, null);
     }
 
     public static void afterInsert(List<Contact> newList) {//NOPMD
+        
 
     }
     
@@ -36,5 +38,23 @@ public with sharing class ContactTriggerHelper {
             }
         }
         Messaging.sendEmail(emailList);
+    }
+
+    // Scenario 30 Write a trigger on contact to prevent duplicate records based on Contact Email.
+    private static void preventDuplicateContact(List<Contact> contactList , Map<Id, Account> oldAccountMap){
+        Set<String> email = new Set<String>();
+        
+        for(Contact contact : contactList) {
+            if(contact.Email != NULL){
+                email.add(contact.Email);
+            }
+        }
+        List<Contact> contacts = [SELECT Id, Email FROM Contact WHERE Email IN : email];
+        for (Contact con : contactList) {
+            if (contacts.size() > 0) {
+                con.addError('Email Already Exits...');
+            }
+       }
+
     }
 }
