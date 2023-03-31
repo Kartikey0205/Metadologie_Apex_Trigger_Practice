@@ -109,7 +109,7 @@ public class AccountService {
 
     // case - 17
     public static List<Account> updatedLeftEmployeeCount(Set<Id> employeeId){
-        List<Account> account = [SELECT Id ,Left_Employee_Count__c ,(SELECT Id FROM Employees__r) FROM Account WHERE Id =:employeeId];
+        List<Account> account = EmployeeSelector.fetchAccountEmployee(employeeId);
         List<Account> updatedAccount = new List<Account>();
         for (Account acc : account) {
             acc.Left_Employee_Count__c = acc.Employees__r.size();
@@ -118,5 +118,15 @@ public class AccountService {
         return !updatedAccount.isEmpty() ? updatedAccount: NULL;
     }
 
-   
+    // Case - 27
+    public static List<Contact> updateOwnerId(Set<Id> accountId){
+        List<Contact> contactList = ContactSelector.fetchContactOwnerId(accountId);
+        List<Contact> updatedRelatedContact = new List<Contact>();
+        for (Contact currentContact : contactList) {
+            currentContact.OwnerId = currentContact.Account.OwnerId;
+            updatedRelatedContact.add(currentContact);
+        }
+
+        return !updatedRelatedContact.isEmpty() ? updatedRelatedContact: NULL;
+    }
 }

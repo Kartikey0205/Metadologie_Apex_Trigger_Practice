@@ -18,5 +18,10 @@ public class ContactSelector { //NOPMD
     return !accounts.isEmpty() ? accounts : null;
   }
 
-  
+  // case - 27
+  public static List<Contact> fetchContactOwnerId(Set<Id> accountIds) {
+    //NOPMD
+    List<Contact> contactList =     [SELECT Id, AccountId , Account.OwnerId FROM Contact WHERE AccountId IN :accountIds];
+    return !contactList.isEmpty() ? contactList : null;
+  }
 }
