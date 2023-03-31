@@ -360,13 +360,7 @@ public with sharing class AccountTriggerHelper { //NOPMD
             }
         }
         if(!accountId.isEmpty()){
-            List<Contact> contactList = [SELECT Id, AccountId , Account.OwnerId FROM Contact WHERE AccountId IN :accountId];
-            List<Contact> updatedRelatedContact = new List<Contact>();
-            for (Contact currentContact : contactList) {
-                currentContact.OwnerId = currentContact.Account.OwnerId;
-                updatedRelatedContact.add(currentContact);
-            }
-
+            List<Contact> updatedRelatedContact = AccountService.updateOwnerId(accountId);
             if(!updatedRelatedContact.isEmpty()){
                 update updatedRelatedContact;
             }

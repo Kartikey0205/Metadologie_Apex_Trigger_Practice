@@ -6,6 +6,7 @@ public class OpportunityTriggerHelper { //NOPMD
   
     public static void afterInsert(List<Opportunity> newList) {//NOPMD
       insertRecentOpportunityAmount(newList, null);
+      populateOpportunityAmountOnAccount(newList , null);
     }
   
     public static void beforeUpdate(List<Opportunity> newList, Map<Id, Opportunity> oldMap) {//NOPMD
@@ -111,4 +112,32 @@ public class OpportunityTriggerHelper { //NOPMD
       }
     }
     
+    //Scenario 23	When any Opportunity is created with amount populated
+    // or Opportunity Amount is updated 
+    //then populate total Amount on Account Level for all related opportunities in Annual Revenue Field. (Annual Revenue field mein total amount dalna h account k and each opportunity k total amount mein annual revenue field dalna h )
+    //If opportunity is deleted or undeleted then update Amount on Account as well. (Hint: rollup summary)
+    private static void populateOpportunityAmountOnAccount(List<Opportunity> opportunityList, Map<Id, Opportunity> oldOpportunityMap){
+      Set<Id> accountId = new Set<Id>();
+      for (Opportunity opportunity : opportunityList) {
+        if(opportunity.Amount != NULL && opportunity.AccountId != NULL){
+          accountId.add(opportunity.AccountId);
+        }
+      }
+
+      if(!accountId.isEmpty()){
+        Map<Id,Account> accountMap = new Map<Id,Account> ( [SELECT Id, AnnualRevenue FROM Account WHERE Id In :accountId] );
+        List<Opportunity> oppList= [SELECT Id,AccountId,Amount FROM opportunity WHERE Id = :opportunityList];
+        List<Account> accounts = new List<Account>();
+        for(Opportunity opportunity : oppList) {
+            if(accountMap.get(opportunity.AccountId).AnnualRevenue == null) {
+                accounts.add(new Account(ID = opportunity.AccountId,AnnualRevenue = opportunity.Amount));
+            }
+           	else {	
+                accounts.add(new Account(ID = opportunity.AccountId , AnnualRevenue = (accountMap.get(opportunity.AccountId).AnnualRevenue)+opportunity.Amount));
+            }
+        }
+        update accounts;
+
+      }
+    }
 }
