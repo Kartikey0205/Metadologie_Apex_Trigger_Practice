@@ -24,6 +24,7 @@ public with sharing class AccountTriggerHelper { //NOPMD
         // updateContactBillingAddress(newList, oldMap);
         updateContactBillingAddressSoql(newList, oldMap);
         updateOpportunityStage(newList, oldMap);
+        populateOwnerIdOnContact(newList , oldMap);
     }
 
     public static void beforeDelete(List<Account> oldList) {//NOPMD
@@ -347,5 +348,28 @@ public with sharing class AccountTriggerHelper { //NOPMD
             }
         }
     }
-   
+ 
+    
+    //Scenario 27	Write a trigger, if the owner of an account is changed then the owner for the related contacts should also be updated. [Without Map]
+
+    private static void populateOwnerIdOnContact(List<Account> accountList , Map<Id, Account> oldAccountMap){
+        Set<Id> accountId = new Set<Id>();
+        for (Account account : accountList) {
+            if(account.OwnerId != oldAccountMap.get(account.Id).OwnerId){
+                accountId.add(account.Id);
+            }
+        }
+        if(!accountId.isEmpty()){
+            List<Contact> contactList = [SELECT Id, AccountId , Account.OwnerId FROM Contact WHERE AccountId IN :accountId];
+            List<Contact> updatedRelatedContact = new List<Contact>();
+            for (Contact currentContact : contactList) {
+                currentContact.OwnerId = currentContact.Account.OwnerId;
+                updatedRelatedContact.add(currentContact);
+            }
+
+            if(!updatedRelatedContact.isEmpty()){
+                update updatedRelatedContact;
+            }
+        }
+    }
 }

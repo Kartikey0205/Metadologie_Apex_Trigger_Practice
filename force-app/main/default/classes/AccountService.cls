@@ -118,15 +118,5 @@ public class AccountService {
         return !updatedAccount.isEmpty() ? updatedAccount: NULL;
     }
 
-    //Case - 19
-    // public static List<Account> updatedLeftEmployeeCountOnUndelete(Map<Id,Employee__c> employeeIdMap){
-    //     List<Account> account = EmployeeSelector.fetchRelatedEmployee(employeeIdMap.keySet());
-    //     [SELECT Id ,Left_Employee_Count__c ,(SELECT Id FROM Employees__r) FROM Account WHERE Id =:employeeId];
-    //     List<Account> updatedAccount = new List<Account>();
-    //     for (Account acc : account) {
-    //         acc.Left_Employee_Count__c = acc.Employees__r.size();
-    //         updatedAccount.add(acc);
-    //     }
-    //     return !updatedAccount.isEmpty() ? updatedAccount: NULL;
-    // }
+   
 }
