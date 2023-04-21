@@ -3,6 +3,15 @@
  */
 
 public class AccountService {
+
+    // public Account createAccount(String accountName , String accNum , String ticketSymbol){
+    //     Account acc = new Account(
+    //         Name = accountName,
+    //         AccountNumber = accNum,
+    //         TickerSymbol = ticketSymbol
+    //     );
+    //     return acc;
+    // }
   /**
    * @description updating Contacts Phone
    * @return ContactList
